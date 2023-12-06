@@ -1,15 +1,19 @@
 package com.example.gson
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
+import android.net.Uri
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import okhttp3.*
 import timber.log.Timber
 import timber.log.Timber.Forest.plant
 import java.io.IOException
+
+const val CODE = 1
 
 interface CellClickListener {
     fun onCellClickListener(link: String)
@@ -17,7 +21,8 @@ interface CellClickListener {
 
 class MainActivity : AppCompatActivity(), CellClickListener {
 
-    private val URL = "https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=ff49fcd4d4a08aa6aafb6ea3de826464&tags=cat&format=json&nojsoncallback=1"
+    private val URL =
+        "https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=ff49fcd4d4a08aa6aafb6ea3de826464&tags=cat&format=json&nojsoncallback=1"
     private val okHttpClient: OkHttpClient = OkHttpClient()
     private var links: Array<String> = arrayOf()
     private lateinit var recyclerView: RecyclerView
@@ -65,7 +70,32 @@ class MainActivity : AppCompatActivity(), CellClickListener {
     override fun onCellClickListener(link: String) {
         val intent = Intent(this, PicActivity::class.java)
         intent.putExtra(getString(R.string.key_link), link)
-        startActivity(intent)
+        startActivityForResult(intent, CODE)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == CODE && resultCode == RESULT_OK) {
+            val link = data?.getStringExtra(getString(R.string.key_link))
+
+            // Добавьте ваш код для обработки результата
+            if (link != null) {
+                val snackbar = Snackbar.make(
+                    findViewById(android.R.id.content),
+                    "Картинка добавлена в избранное",
+                    Snackbar.LENGTH_LONG
+                )
+
+                snackbar.setAction("Открыть") {
+                    // Открыть ссылку во встроенном браузере
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(link))
+                    startActivity(intent)
+                }
+
+                snackbar.show()
+            }
+        }
     }
 }
 

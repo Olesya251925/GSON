@@ -8,6 +8,5 @@
         android:layout_width="150dp"
         android:layout_height="150dp"
         android:layout_margin="4dp"
-        android:scaleType="centerCrop"
-        android:text=" "/>
+        android:scaleType="centerCrop" />
 </FrameLayout>
